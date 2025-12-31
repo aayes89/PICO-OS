@@ -1,5 +1,5 @@
 # PICO-OS
-Sistema operativo Unix-Like para RPI Pico W.
+Sistema operativo Unix-Like para RPI Pico W con motor de intérprete para el lenguaje C.
 
 # Capacidades
 * Sistema de almacenamiento permanente (LittleFS).
@@ -8,9 +8,10 @@ Sistema operativo Unix-Like para RPI Pico W.
 * Servidor web local para gestión remota.
 * Conectividad WiFi.
 * Navegador web en ascii. (limitado a 500 caracteres)
+* Intérprete para lenguaje C <b>minic</b> (soporte para tipos de datos, arreglos, funciones, etc). <b>Casi es un proyecto completo independiente.</b>
+* Soporte para ejecutar aplicaciones. (usar intérprete <b>minic</b> incluido ya)
 
 # Por hacer
 * Soporte de video para salida VGA.
 * Soporte de audio.
-* Soporte para ejecutar aplicaciones.
 * Soporte para módulos LoRa y W5500 (redes).
