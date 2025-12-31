@@ -15,3 +15,4 @@ Sistema operativo Unix-Like para RPI Pico W con motor de intérprete para el len
 * Soporte de video para salida VGA.
 * Soporte de audio.
 * Soporte para módulos LoRa y W5500 (redes).
+* Optimizar el intérprete para que ocupe la mínima cantidad de memoria posible.
