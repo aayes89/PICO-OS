@@ -1,5 +1,6 @@
 # PICO-OS
-Sistema operativo Unix-Like creado con Arduino IDE para RPI Pico W con motor de intérprete para lenguaje C integrado.
+Sistema operativo Unix-Like creado con Arduino IDE para RPI Pico W con motor de intérprete para lenguaje C integrado. <br>
+Empezó como una obsesión por ver si era posible portar Linux 1.0 a la Rpi Pico sin necesidad de módulos MicroSD, pero al final terminé escribiendo un kernel monolítico bastante funcional.<br>
 
 # Configuración
 * Librería Raspberry Pi Pico/RP2040/RP2350 de <a href="https://github.com/earlephilhower/arduino-pico">Earle F. Philhower, III<a/>.
