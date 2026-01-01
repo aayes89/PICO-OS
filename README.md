@@ -1,5 +1,19 @@
 # PICO-OS
-Sistema operativo Unix-Like para RPI Pico W con motor de intérprete para el lenguaje C.
+Sistema operativo Unix-Like creado con Arduino IDE para RPI Pico W con motor de intérprete para lenguaje C integrado.
+
+# Configuración
+* Librería Raspberry Pi Pico/RP2040/RP2350 de <a href="https://github.com/earlephilhower/arduino-pico">Earle F. Philhower, III<a/>.
+* Flash size: 2MB (1MB flash / 1MB sketch)
+* CPU speed: 200MHZ
+* IP/Bluetooth stack: IPv4 + IPv6 + Bluetooth stack
+* Optimize: Small (-Os) standar
+* Upload method: default (UF2)
+* Operating system: None
+* Profiling: disabled
+* RTTI: disabled
+* Stack protector: disabled
+* USB stack: Pico SDK
+* WiFi region: Worldwide
 
 # Capacidades
 * Sistema de almacenamiento permanente (LittleFS).
@@ -16,6 +30,7 @@ Sistema operativo Unix-Like para RPI Pico W con motor de intérprete para el len
 * Soporte de audio.
 * Soporte para módulos LoRa y W5500 (redes).
 * Optimizar el intérprete para que ocupe la mínima cantidad de memoria posible.
+* Editor de texto estilo nano.
 
 # Capturas
 <img width="1230" height="475" alt="imagen" src="https://github.com/user-attachments/assets/4b38bda7-7d51-419f-81a4-d154aa38cd6c" />
