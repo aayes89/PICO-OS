@@ -21,7 +21,7 @@ Empezó como una obsesión por ver si era posible portar Linux 1.0 a la Rpi Pico
 * Shell con manejo de archivos estilo Busybox.
 * Terminal (Serial o Web).
 * Servidor web local para gestión remota.
-* Conectividad WiFi.
+* Conectividad WiFi. (modo STA y AP)
 * Navegador web en ascii. (limitado a 500 caracteres)
 * Intérprete para lenguaje C <b>minic</b> (soporte para tipos de datos, arreglos, funciones, etc). <b>Casi es un proyecto completo independiente.</b>
 * Soporte para ejecutar aplicaciones. (usar intérprete <b>minic</b> incluido ya)
