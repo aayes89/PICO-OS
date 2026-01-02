@@ -37,4 +37,5 @@ void cmd_httpget(int argc, char* argv[]);
 void cmd_reboot(int argc, char* argv[]);
 void cmd_neofetch(int argc, char* argv[]);
 void cmd_minic(int argc, char* argv[]);
+void cmd_nano(int argc, char* argv[]);
 void cmd_about(int argc, char* argv[]);

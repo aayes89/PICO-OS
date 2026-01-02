@@ -3,8 +3,9 @@
 #include "fs.h"
 #include "wifi.h"
 #include "engine/mini_c.c"
+#include "editor.h"
 
-extern unsigned long startTime;   // Para calcular uptime
+extern unsigned long startTime;  // Para calcular uptime
 
 Command commands[] = {
   { "help", cmd_help, "Muestra esta ayuda" },
@@ -29,8 +30,9 @@ Command commands[] = {
   { "ping", cmd_ping, "Ping a IP o dominio" },
   { "httpget", cmd_httpget, "GET HTTP simple a URL" },
   { "reboot", cmd_reboot, "Reinicia el Pico" },
-  { "neofetch", cmd_neofetch, "Muestra info del sistema con estilo neofetch" },  
-  { "minic", cmd_minic, "Intérprete minimalista para lenguaje C"},
+  { "neofetch", cmd_neofetch, "Muestra info del sistema con estilo neofetch" },
+  { "minic", cmd_minic, "Intérprete minimalista para lenguaje C" },
+  { "nano", cmd_nano, "Editor de texto estilo nano" },
   { "about", cmd_about, "Acerca del sistema." },
   { nullptr, nullptr, nullptr }  // fin de lista
 };
@@ -566,108 +568,120 @@ void cmd_neofetch(int argc, char* argv[]) {
   }
   outPrintln();
 }
-void cmd_minic(int argc, char** argv)
-{
-    if (argc < 2) {
-        outPrintln("Uso:");
-        outPrintln("  minic \"código aquí\"                  → ejecuta código directamente");
-        outPrintln("  minic file nombre_archivo.mini         → ejecuta desde archivo en LittleFS");
-        outPrintln("  minic help                             → muestra esta ayuda");
-        return;
+void cmd_minic(int argc, char** argv) {
+  if (argc < 2) {
+    outPrintln("Uso:");
+    outPrintln("  minic \"código aquí\"                  → ejecuta código directamente");
+    outPrintln("  minic file nombre_archivo.mini         → ejecuta desde archivo en LittleFS");
+    outPrintln("  minic help                             → muestra esta ayuda");
+    return;
+  }
+
+  // Ayuda explícita
+  if (strcmp(argv[1], "help") == 0) {
+    cmd_minic(1, NULL);  // recursión ligera solo para mostrar ayuda
+    return;
+  }
+
+  // -------------------------------------------------------
+  // Modo 1: Código directo entre comillas
+  // -------------------------------------------------------
+  if (argc == 2 && (argv[1][0] == '"' || argv[1][0] == '\'')) {
+    // Quitamos las comillas externas si existen
+    char* code = argv[1];
+    if (code[0] == '"' || code[0] == '\'') {
+      code++;
+      size_t len = strlen(code);
+      if (len > 0 && (code[len - 1] == '"' || code[len - 1] == '\'')) {
+        code[len - 1] = '\0';
+      }
     }
 
-    // Ayuda explícita
-    if (strcmp(argv[1], "help") == 0) {
-        cmd_minic(1, NULL);  // recursión ligera solo para mostrar ayuda
-        return;
+    outPrintln("Ejecutando código directo...\n");
+    outPrint("Código: ");
+    outPrintln(code);
+    outPrintln("----------------------------------------");
+
+    minic_run(code);
+
+    outPrintln("----------------------------------------");
+    outPrintln("[MiniC finalizado]");
+    return;
+  }
+
+  // -------------------------------------------------------
+  // Modo 2: Cargar desde archivo en LittleFS
+  // -------------------------------------------------------
+  if (argc >= 3 && strcmp(argv[1], "file") == 0) {
+    const char* filename = argv[2];
+
+    // Intentamos abrir el archivo
+    File file = LittleFS.open(filename, "r");
+    if (!file) {
+      outPrint("Error: No se pudo abrir el archivo: ");
+      outPrintln(filename);
+      return;
     }
 
-    // -------------------------------------------------------
-    // Modo 1: Código directo entre comillas
-    // -------------------------------------------------------
-    if (argc == 2 && (argv[1][0] == '"' || argv[1][0] == '\'')) {
-        // Quitamos las comillas externas si existen
-        char* code = argv[1];
-        if (code[0] == '"' || code[0] == '\'') {
-            code++;
-            size_t len = strlen(code);
-            if (len > 0 && (code[len-1] == '"' || code[len-1] == '\'')) {
-                code[len-1] = '\0';
-            }
-        }
-
-        outPrintln("Ejecutando código directo...\n");
-        outPrint("Código: ");
-        outPrintln(code);
-        outPrintln("----------------------------------------");
-
-        minic_run(code);
-
-        outPrintln("----------------------------------------");
-        outPrintln("[MiniC finalizado]");
-        return;
+    // Calculamos tamaño
+    size_t size = file.size();
+    if (size == 0) {
+      outPrintln("El archivo está vacío");
+      file.close();
+      return;
+    }
+    if (size > 4096) {  // límite razonable para evitar desbordamientos
+      outPrintln("Error: Programa demasiado grande (>4KB)");
+      file.close();
+      return;
     }
 
-    // -------------------------------------------------------
-    // Modo 2: Cargar desde archivo en LittleFS
-    // -------------------------------------------------------
-    if (argc >= 3 && strcmp(argv[1], "file") == 0) {
-        const char* filename = argv[2];
-
-        // Intentamos abrir el archivo
-        File file = LittleFS.open(filename, "r");
-        if (!file) {
-            outPrint("Error: No se pudo abrir el archivo: ");
-            outPrintln(filename);
-            return;
-        }
-
-        // Calculamos tamaño
-        size_t size = file.size();
-        if (size == 0) {
-            outPrintln("El archivo está vacío");
-            file.close();
-            return;
-        }
-        if (size > 4096) {  // límite razonable para evitar desbordamientos
-            outPrintln("Error: Programa demasiado grande (>4KB)");
-            file.close();
-            return;
-        }
-
-        // Reservamos buffer
-        char* buffer = (char*)malloc(size + 1);
-        if (!buffer) {
-            outPrintln("Error: No hay suficiente memoria");
-            file.close();
-            return;
-        }
-
-        // Leemos todo el contenido
-        size_t read = file.readBytes(buffer, size);
-        buffer[read] = '\0';  // terminador nulo importante!!
-        file.close();
-
-        outPrint("Ejecutando desde archivo: ");
-        outPrintln(filename);
-        outPrint("Tamaño: ");
-        outPrint(String(read));
-        outPrintln(" bytes");
-        outPrintln("----------------------------------------");
-
-        minic_run(buffer);
-
-        outPrintln("----------------------------------------");
-        outPrintln("[MiniC finalizado]");
-
-        free(buffer);
-        return;
+    // Reservamos buffer
+    char* buffer = (char*)malloc(size + 1);
+    if (!buffer) {
+      outPrintln("Error: No hay suficiente memoria");
+      file.close();
+      return;
     }
 
-    // Si no entendimos el formato
-    outPrintln("Formato no reconocido.");
-    outPrintln("Usa: minic help  para ver las opciones.");
+    // Leemos todo el contenido
+    size_t read = file.readBytes(buffer, size);
+    buffer[read] = '\0';  // terminador nulo importante!!
+    file.close();
+
+    outPrint("Ejecutando desde archivo: ");
+    outPrintln(filename);
+    outPrint("Tamaño: ");
+    outPrint(String(read));
+    outPrintln(" bytes");
+    outPrintln("----------------------------------------");
+
+    minic_run(buffer);
+
+    outPrintln("----------------------------------------");
+    outPrintln("[MiniC finalizado]");
+
+    free(buffer);
+    return;
+  }
+
+  // Si no entendimos el formato
+  outPrintln("Formato no reconocido.");
+  outPrintln("Usa: minic help  para ver las opciones.");
 }
+//static NanoLite editor;
+static Editor editor;
+
+void cmd_nano(int argc, char* argv[]) {
+  if (argc < 2) {
+    outPrintln("Uso: nano archivo");
+    return;
+  }
+
+  editor.openFile(argv[1]);
+  editor.run();
+}
+
 void cmd_reboot(int argc, char* argv[]) {
   outPrintln("Reiniciando Pico en 2 segundos...");
   delay(2000);
